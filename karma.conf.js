@@ -1,5 +1,4 @@
 module.exports = function(config) {
-	process.env['PHANTOMJS_BIN'] = 'node_modules/.bin/phantomjs';
 	config.set({
 		// base path, that will be used to resolve files and exclude
 		basePath : '',
