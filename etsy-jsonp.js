@@ -1,4 +1,4 @@
-;(function() {
+(function() {
 	'use strict';
 	var jsonpID = 0,
 		API_URL = 'https://openapi.etsy.com/v2/';
@@ -7,13 +7,13 @@
 	 * JSONP Client for Etsy. GET is the only function supported by JSONP
 	 * @param options object
 	 * {
-	 * 		apiKey string (mandatory)
-	 * 		apiUrl string (optional)
+	 *   apiKey string (mandatory)
+	 *   apiUrl string (optional)
 	 * }
 	 * @constructor
 	 */
 	function EtsyJsonp(options) {
-		if(!options.apiKey) {
+		if (!options.apiKey) {
 			throw new Error('apiKey is required');
 		}
 		this._apiKey = options.apiKey;
@@ -95,7 +95,7 @@
 			var path = options.path.replace(/^\//, '');
 
 			// If the path does not end in .js, add it to the end
-			if(!path.match(/\.js$/i)) {
+			if (!path.match(/\.js$/i)) {
 				path += '.js';
 			}
 
@@ -121,11 +121,11 @@
 				}
 			}
 
-			params.api_key = this._apiKey;
+			params['api_key'] = this._apiKey;
 			params.callback = callbackName;
 
 			// Random string to disable caching
-			if(options.disableCaching !== true) {
+			if (options.disableCaching !== true) {
 				params.___ = this._createRandomString(10);
 			}
 
@@ -154,7 +154,7 @@
 		 * @private
 		 */
 		_executeCallbacks: function _executeCallbacks(response, error, options) {
-			if(typeof response === 'object' && response.ok === true) {
+			if (typeof response === 'object' && response.ok === true) {
 				if (typeof options.success === 'function') {
 					options.success({
 						response: response
@@ -186,15 +186,14 @@
 		_objectToQueryString: function _objectToQueryString(obj) {
 			var queryParts = [];
 			for (var key in obj) {
-				if (!obj.hasOwnProperty(key)) {
-					continue;
+				if (obj.hasOwnProperty(key)) {
+					var val = obj[key];
+					var part = encodeURIComponent(key);
+					if (val) {
+						part += '=' + encodeURIComponent(val);
+					}
+					queryParts.push(part);
 				}
-				var val = obj[key];
-				var part = encodeURIComponent(key);
-				if (val) {
-					part += '=' + encodeURIComponent(val);
-				}
-				queryParts.push(part);
 			}
 
 			return '?' + queryParts.join('&');
@@ -241,7 +240,7 @@
 	};
 
 	// If the user is using require, define the module
-	if(typeof define === 'function' && define.amd) {
+	if (typeof define === 'function' && define.amd) {
 		define(EtsyJsonp);
 	} else {
 		window['EtsyJsonp'] = EtsyJsonp;

@@ -1,11 +1,12 @@
 module.exports = function(config) {
+	process.env['PHANTOMJS_BIN'] = 'node_modules/.bin/phantomjs';
 	config.set({
 		// base path, that will be used to resolve files and exclude
 		basePath : '',
 
 		// list of files / patterns to load in the browser
 		files: [
-			'*.js',
+			'etsy-jsonp.js',
 			'test/*.spec.js'
 		],
 
@@ -36,7 +37,7 @@ module.exports = function(config) {
 		// - Safari (only Mac)
 		// - PhantomJS
 		// - IE (only Windows)
-		browsers: ['Chrome'],
+		browsers: ['PhantomJS'],
 
 		frameworks: ["jasmine"],
 
