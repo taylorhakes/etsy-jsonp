@@ -189,7 +189,7 @@
 				if (obj.hasOwnProperty(key)) {
 					var val = obj[key];
 					var part = encodeURIComponent(key);
-					if (val) {
+					if (val || val === 0) {
 						part += '=' + encodeURIComponent(val);
 					}
 					queryParts.push(part);

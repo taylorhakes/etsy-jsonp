@@ -96,7 +96,7 @@
 		it('Params are added to URL', function() {
 			var changed = false;
 			spyOnJsonp(function(url) {
-				if (url.match(/foo=bar/) && url.match(/hello=world/)) {
+				if (url.match(/foo=0/) && url.match(/hello=world/)) {
 					changed = true;
 				}
 			});
@@ -108,7 +108,7 @@
 				path: '/path.js',
 				params: {
 					hello: 'world',
-					foo: 'bar'
+					foo: 0
 				}
 			});
 			expect(changed).toBe(true);
