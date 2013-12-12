@@ -9,9 +9,16 @@
 		};
 	}
 
-	function createFakeScript() {
+	function createFakeScript(removeCallback) {
 		var script = {
-			src: ''
+			src: '',
+			parentNode: {
+				removeChild: function() {
+					if(removeCallback) {
+						removeCallback();
+					}
+				}
+			}
 		};
 		if (document.body.addEventListener) {
 			script.addEventListener = function(event, callback) {
@@ -25,9 +32,9 @@
 		return script;
 	}
 
-	function spyOnCreateElement() {
+	function spyOnCreateElement(removeCallback) {
 		var oldCreateElement = document.createElement;
-		var script = createFakeScript();
+		var script = createFakeScript(removeCallback);
 		document.createElement = function() {
 			document.createElement = oldCreateElement;
 			return script;
@@ -365,6 +372,52 @@
 			});
 			expect(changed).toBe(true);
 		});
+		it('Abort function works', function() {
+			debugger;
+			var changed = false;
+			var testName = 'customEtsy';
+			var removed = false;
+			spyOnCreateElement(function() {
+				removed = true;
+			});
+			spyOnJsonp(function(url, script) {
+				if (window[testName]) {
+					setTimeout(function() {
+						window[testName]({
+							ok: true
+						});
+						script.onload({
+							type: null
+						});
+						delete window[testName];
+					}, 100);
+				}
+			});
+
+			var test = new EtsyJsonp({
+				apiUrl: 'http://hello/',
+				apiKey: 'test'
+			});
+			var xhr = test.get({
+				path: '/path/:first/:second.js',
+				callbackName: 'customEtsy',
+				params: {
+					first: 123,
+					second: 555,
+					foo: 'bar'
+				},
+				error: function(info) {
+					if (info.error === 'Request Aborted') {
+						changed = true;
+					}
+				}
+			});
+			xhr.abort();
+			expect(removed).toBe(true);
+			expect(changed).toBe(true);
+
+		});
+
 	});
 
 })();

@@ -39,7 +39,7 @@
 		 * }
 		 */
 		get: function(options) {
-			this._requestJsonp(options);
+			return this._requestJsonp(options);
 		},
 		/***
 		 * Internal request function used by get, not to be called outsit
@@ -67,6 +67,7 @@
 			var onScript = function(e, errorType) {
 				clearTimeout(abortTimeout);
 				self._removeScriptEvents(script, onScript);
+				script.parentNode.removeChild(script);
 
 				var error = null;
 				if (e.type === 'error') {
@@ -140,6 +141,12 @@
 					onScript({ type: 'error'}, 'timeout');
 				}, options.timeout || 5000);
 			}
+
+			return {
+				abort: function abort() {
+					onScript({ type: 'error'}, 'Request Aborted');
+				}
+			};
 		},
 		/**
 		 * Call the correct callbacks based on a response
