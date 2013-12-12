@@ -15,7 +15,7 @@ var etsyApi = new EtsyJsonp({
 });
 
 // Search for golf keyword
-etsyApi.get({
+var etsyXhr = etsyApi.get({
 	path: 'listings/active.js',
 	params: {
 	    keywords: 'golf',
@@ -34,6 +34,9 @@ etsyApi.get({
 		console.log('done');
 	}
 });
+
+// To abort the previous call
+etsyXhr.abort();
 ```
 
 The MIT License (MIT)
