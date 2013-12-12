@@ -228,8 +228,8 @@
 				script.detachEvent('load', callback);
 				script.detachEvent('error', callback);
 			} else {
-				script.onload = undefined;
-				script.onerror = undefined;
+				script.onload = callback;
+				script.onerror = callback;
 			}
 		},
 		_removeScriptEvents: function _removeScriptEvents(script, callback) {
@@ -240,8 +240,8 @@
 				script.attachEvent('load', callback);
 				script.attachEvent('error', callback);
 			} else {
-				script.onload = callback;
-				script.onerror = callback;
+				script.onload = undefined;
+				script.onerror = undefined;
 			}
 		}
 	};
