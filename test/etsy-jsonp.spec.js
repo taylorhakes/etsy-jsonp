@@ -9,7 +9,8 @@
 		};
 	}
 
-	function createFakeScript(removeCallback) {
+    // Script with an addEventListener funciton on it
+	function createFakeScript(type, removeCallback) {
 		var script = {
 			src: '',
 			parentNode: {
@@ -20,21 +21,24 @@
 				}
 			}
 		};
-		if (document.body.addEventListener) {
-			script.addEventListener = function(event, callback) {
-				script.onload = callback;
-			};
-		} else if (document.body.attachEvent) {
-			script.attachEvent = function(event, callback) {
-				script.onload = callback;
-			};
-		}
+        if(type === 'eventListener') {
+            script.addEventListener = function(event, callback) {
+                script.onload = callback;
+            };
+            script.removeEventListener = function(event, callback) {};
+        } else if(type === 'attachEvent') {
+            script.attachEvent = function(event, callback) {
+                script.onload = callback;
+            };
+            script.detachEvent = function(event, callback) {};
+        }
+
 		return script;
 	}
 
-	function spyOnCreateElement(removeCallback) {
+	function spyOnCreateElement(type, removeCallback) {
 		var oldCreateElement = document.createElement;
-		var script = createFakeScript(removeCallback);
+		var script = createFakeScript(type, removeCallback);
 		document.createElement = function() {
 			document.createElement = oldCreateElement;
 			return script;
@@ -83,17 +87,21 @@
 			expect(changed).toBe(true);
 		});
 	});
-	describe('get function valid params', function() {
+	describe('get function different params', function() {
+        var test = null;
+        beforeEach(function() {
+            test = new EtsyJsonp({
+                apiUrl: 'http://hello/',
+                apiKey: 'test'
+            });
+        });
+
 		it('Path is correct', function() {
 			var changed = false;
 			spyOnJsonp(function(url) {
 				if (url.match(/^http:\/\/hello\/path\.js/)) {
 					changed = true;
 				}
-			});
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
 			});
 			test.get({
 				path: '/path.js'
@@ -106,10 +114,6 @@
 				if (url.match(/foo=0/) && url.match(/hello=world/)) {
 					changed = true;
 				}
-			});
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
 			});
 			test.get({
 				path: '/path.js',
@@ -127,10 +131,6 @@
 					changed = true;
 				}
 			});
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
 			test.get({
 				path: '/path/:hello.js',
 				params: {
@@ -146,10 +146,6 @@
 				if (url.match(/^http:\/\/hello\/path\/123\/555\.js/) && url.match(/foo=bar/) && !url.match(/first=/) && !url.match(/second=/)) {
 					changed = true;
 				}
-			});
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
 			});
 			test.get({
 				path: '/path/:first/:second.js',
@@ -167,10 +163,6 @@
 				if (url.match(/___=/)) {
 					changed = true;
 				}
-			});
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
 			});
 			test.get({
 				path: '/path/:first/:second.js',
@@ -214,11 +206,6 @@
 					delete window[testName];
 				}
 			});
-
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
 			test.get({
 				path: '/path/:first/:second.js',
 				callbackName: 'customEtsy',
@@ -230,194 +217,429 @@
 			});
 			expect(changed).toBe(true);
 		});
-		it('Success function works', function() {
-			var changed = false;
-			var testName = 'customEtsy';
-			spyOnCreateElement();
-			spyOnJsonp(function(url, script) {
-				if (window[testName]) {
-					window[testName]({
-						ok: true
-					});
-					script.onload({
-						type: null
-					});
-					delete window[testName];
-				}
-			});
 
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
-			test.get({
-				path: '/path/:first/:second.js',
-				callbackName: 'customEtsy',
-				params: {
-					first: 123,
-					second: 555,
-					foo: 'bar'
-				},
-				success: function(info) {
-					if(info.response && info.response.ok) {
-						changed = true;
-					}
-				}
-			});
-			expect(changed).toBe(true);
-		});
-		it('Error function works', function() {
-			var changed = false;
-			var testName = 'customEtsy';
-			spyOnCreateElement();
-			spyOnJsonp(function(url, script) {
-				if (window[testName]) {
-					window[testName]({
-						ok: false,
-						error: 'Weird Error'
-					});
-					script.onload({
-						type: null
-					});
-					delete window[testName];
-				}
-			});
-
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
-			test.get({
-				path: '/path/:first/:second.js',
-				callbackName: 'customEtsy',
-				params: {
-					first: 123,
-					second: 555,
-					foo: 'bar'
-				},
-				error: function(info) {
-					if (info.error === 'Weird Error') {
-						changed = true;
-					}
-				}
-			});
-			expect(changed).toBe(true);
-		});
-		it('Done function works with error', function() {
-			var changed = false;
-			var testName = 'customEtsy';
-			spyOnCreateElement();
-			spyOnJsonp(function(url, script) {
-				if (window[testName]) {
-					window[testName]({
-						ok: false,
-						error: 'Weird Error'
-					});
-					script.onload({
-						type: null
-					});
-					delete window[testName];
-				}
-			});
-
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
-			test.get({
-				path: '/path/:first/:second.js',
-				callbackName: 'customEtsy',
-				params: {
-					first: 123,
-					second: 555,
-					foo: 'bar'
-				},
-				done: function() {
-					changed = true;
-				}
-			});
-			expect(changed).toBe(true);
-		});
-		it('Done function works with success', function() {
-			var changed = false;
-			var testName = 'customEtsy';
-			spyOnCreateElement();
-			spyOnJsonp(function(url, script) {
-				if (window[testName]) {
-					window[testName]({
-						ok: true
-					});
-					script.onload({
-						type: null
-					});
-					delete window[testName];
-				}
-			});
-
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
-			test.get({
-				path: '/path/:first/:second.js',
-				callbackName: 'customEtsy',
-				params: {
-					first: 123,
-					second: 555,
-					foo: 'bar'
-				},
-				done: function() {
-					changed = true;
-				}
-			});
-			expect(changed).toBe(true);
-		});
-		it('Abort function works', function() {
-			debugger;
-			var changed = false;
-			var testName = 'customEtsy';
-			var removed = false;
-			spyOnCreateElement(function() {
-				removed = true;
-			});
-			spyOnJsonp(function(url, script) {
-				if (window[testName]) {
-					setTimeout(function() {
-						window[testName]({
-							ok: true
-						});
-						script.onload({
-							type: null
-						});
-						delete window[testName];
-					}, 100);
-				}
-			});
-
-			var test = new EtsyJsonp({
-				apiUrl: 'http://hello/',
-				apiKey: 'test'
-			});
-			var xhr = test.get({
-				path: '/path/:first/:second.js',
-				callbackName: 'customEtsy',
-				params: {
-					first: 123,
-					second: 555,
-					foo: 'bar'
-				},
-				error: function(info) {
-					if (info.error === 'Request Aborted') {
-						changed = true;
-					}
-				}
-			});
-			xhr.abort();
-			expect(removed).toBe(true);
-			expect(changed).toBe(true);
-
-		});
-
+        it('Check original callback', function() {
+            var changed = false;
+            var testName = 'customEtsy';
+            spyOnCreateElement('eventListener');
+            spyOnJsonp(function(url, script) {
+                if (window[testName]) {
+                    window[testName]({
+                        ok: true
+                    });
+                    script.onload({
+                        type: null
+                    });
+                    delete window[testName];
+                }
+            });
+            window[testName] = function original(data) {
+                if(data.ok) {
+                    changed = true;
+                }
+                window[testName] = undefined;
+            };
+            test.get({
+                path: '/path/:first/:second.js',
+                callbackName: 'customEtsy',
+                params: {
+                    first: 123,
+                    second: 555,
+                    foo: 'bar'
+                }
+            });
+            expect(changed).toBe(true);
+        })
 	});
+
+    describe('Check success callback', function() {
+        var testName = 'customEtsy';
+        var test = null;
+        beforeEach(function() {
+            test = new EtsyJsonp({
+                apiUrl: 'http://hello/',
+                apiKey: 'test'
+            });
+        });
+
+        function jsonpCallback(url, script) {
+            if (window[testName]) {
+                window[testName]({
+                    ok: true
+                });
+                script.onload({
+                    type: null
+                });
+                delete window[testName];
+            }
+        }
+
+        function callGet(callback) {
+            test.get({
+                path: '/path/:first/:second.js',
+                callbackName: testName,
+                params: {
+                    first: 123,
+                    second: 555,
+                    foo: 'bar'
+                },
+                success: function(info) {
+                    if(info.response && info.response.ok) {
+                        callback();
+                    }
+                }
+            });
+        }
+
+
+        it('Works with eventListener supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('eventListener');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with attachEvent supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('attachEvent');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with unsupported browsers eventListener or attachEvent', function() {
+            var changed = false;
+
+            spyOnCreateElement();
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+    });
+
+    describe('Check error callback', function() {
+        var testName = 'customEtsy';
+        var test = null;
+        beforeEach(function() {
+            test = new EtsyJsonp({
+                apiUrl: 'http://hello/',
+                apiKey: 'test'
+            });
+        });
+
+        function jsonpCallback(url, script) {
+            if (window[testName]) {
+                window[testName]({
+                    ok: false,
+                    error: 'Weird Error'
+                });
+                script.onload({
+                    type: null
+                });
+                delete window[testName];
+            }
+        }
+
+        function callGet(callback) {
+            test.get({
+                path: '/path/:first/:second.js',
+                callbackName: 'customEtsy',
+                params: {
+                    first: 123,
+                    second: 555,
+                    foo: 'bar'
+                },
+                error: function(info) {
+                    if (info.error === 'Weird Error') {
+                        callback();
+                    }
+                }
+            });
+        }
+
+
+        it('Works with eventListener supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('eventListener');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with attachEvent supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('attachEvent');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with unsupported browsers eventListener or attachEvent', function() {
+            var changed = false;
+
+            spyOnCreateElement();
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+    });
+
+
+    describe('Check done callback with error', function() {
+        var testName = 'customEtsy';
+        var test = null;
+        beforeEach(function() {
+            test = new EtsyJsonp({
+                apiUrl: 'http://hello/',
+                apiKey: 'test'
+            });
+        });
+
+        function jsonpCallback(url, script) {
+            if (window[testName]) {
+                window[testName]({
+                    ok: false,
+                    error: 'Weird Error'
+                });
+                script.onload({
+                    type: null
+                });
+                delete window[testName];
+            }
+        }
+
+        function callGet(callback) {
+            test.get({
+                path: '/path/:first/:second.js',
+                callbackName: 'customEtsy',
+                params: {
+                    first: 123,
+                    second: 555,
+                    foo: 'bar'
+                },
+                done: function() {
+                    callback();
+                }
+            });
+        }
+
+
+        it('Works with eventListener supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('eventListener');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with attachEvent supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('attachEvent');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with unsupported browsers eventListener or attachEvent', function() {
+            var changed = false;
+
+            spyOnCreateElement();
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+    });
+
+    describe('Check done callback with success', function() {
+        var testName = 'customEtsy';
+        var test = null;
+        beforeEach(function() {
+            test = new EtsyJsonp({
+                apiUrl: 'http://hello/',
+                apiKey: 'test'
+            });
+        });
+
+        function jsonpCallback(url, script) {
+            if (window[testName]) {
+                window[testName]({
+                    ok: true
+                });
+                script.onload({
+                    type: null
+                });
+                delete window[testName];
+            }
+        }
+
+        function callGet(callback) {
+            test.get({
+                path: '/path/:first/:second.js',
+                callbackName: 'customEtsy',
+                params: {
+                    first: 123,
+                    second: 555,
+                    foo: 'bar'
+                },
+                done: function() {
+                    callback();
+                }
+            });
+        }
+
+
+        it('Works with eventListener supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('eventListener');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with attachEvent supported browsers', function() {
+            var changed = false;
+
+            spyOnCreateElement('attachEvent');
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+        it('Works with unsupported browsers eventListener or attachEvent', function() {
+            var changed = false;
+
+            spyOnCreateElement();
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+
+            expect(changed).toBe(true);
+        });
+
+    });
+
+    describe('Check abort function', function() {
+        var test = null;
+        beforeEach(function() {
+            test = new EtsyJsonp({
+                apiUrl: 'http://hello/',
+                apiKey: 'test'
+            });
+        });
+
+        function jsonpCallback(url, script) {
+        }
+
+        function callGet(callback) {
+            var xhr = test.get({
+                path: '/path/:first/:second.js',
+                callbackName: 'customEtsy',
+                params: {
+                    first: 123,
+                    second: 555,
+                    foo: 'bar'
+                },
+                error: function(info) {
+                    if (info.error === 'Request Aborted') {
+                        callback();
+                    }
+                }
+            });
+            xhr.abort();
+
+        }
+
+
+        it('Works with eventListener supported browsers', function() {
+            var removed = false;
+            var changed = false;
+
+            spyOnCreateElement('eventListener',function() {
+                removed = true;
+            });
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+            expect(removed).toBe(true);
+            expect(changed).toBe(true);
+        });
+
+        it('Works with attachEvent supported browsers', function() {
+            var removed = false;
+            var changed = false;
+
+            spyOnCreateElement('attachEvent', function() {
+                removed = true;
+            });
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+            expect(removed).toBe(true);
+            expect(changed).toBe(true);
+        });
+
+        it('Works with unsupported browsers eventListener or attachEvent', function() {
+            var removed = false;
+            var changed = false;
+
+            spyOnCreateElement(null, function() {
+                removed = true;
+            });
+            spyOnJsonp(jsonpCallback);
+            callGet(function() {
+                changed = true;
+            });
+            expect(removed).toBe(true);
+            expect(changed).toBe(true);
+        });
+
+    });
 
 })();

@@ -12,7 +12,14 @@ module.exports = function(config) {
 
 		// test results reporter to use
 		// possible values: 'dots', 'progress', 'junit'
-		reporters: ['progress'],
+		reporters: ['progress', 'coverage'],
+
+        preprocessors: {
+            // source files, that you wanna generate coverage for
+            // do not include tests or libraries
+            // (these files will be instrumented by Istanbul)
+            '*.js': ['coverage']
+        },
 
 		// web server port
 		port: 9876,
@@ -36,7 +43,7 @@ module.exports = function(config) {
 		// - Safari (only Mac)
 		// - PhantomJS
 		// - IE (only Windows)
-		browsers: ['PhantomJS'],
+		browsers: ['Chrome'],
 
 		frameworks: ["jasmine"],
 

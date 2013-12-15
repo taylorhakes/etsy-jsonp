@@ -78,7 +78,7 @@
 
 				window[callbackName] = originalCallback;
 				if (responseData && typeof originalCallback === 'function') {
-					originalCallback(responseData[0]);
+					originalCallback(responseData);
 				}
 
 				originalCallback = responseData = undefined;
@@ -136,11 +136,9 @@
 			// Based on browser support, attach to the correct element
 			(document.head || document.documentElement).appendChild(script);
 
-			if (options.timeout > 0) {
-				abortTimeout = setTimeout(function() {
-					onScript({ type: 'error'}, 'timeout');
-				}, options.timeout || 5000);
-			}
+            abortTimeout = setTimeout(function() {
+                onScript({ type: 'error'}, 'timeout');
+            }, options.timeout || 5000);
 
 			return {
 				abort: function abort() {
@@ -225,8 +223,8 @@
 				script.addEventListener('load', callback);
 				script.addEventListener('error', callback);
 			} else if (script.detachEvent) {
-				script.detachEvent('load', callback);
-				script.detachEvent('error', callback);
+				script.attachEvent('load', callback);
+				script.attachEvent('error', callback);
 			} else {
 				script.onload = callback;
 				script.onerror = callback;
@@ -236,9 +234,9 @@
 			if (script.removeEventListener) {
 				script.removeEventListener('load', callback);
 				script.removeEventListener('error', callback);
-			} else if (script.attachEvent) {
-				script.attachEvent('load', callback);
-				script.attachEvent('error', callback);
+			} else if (script.detachEvent) {
+				script.detachEvent('load', callback);
+				script.detachEvent('error', callback);
 			} else {
 				script.onload = undefined;
 				script.onerror = undefined;

@@ -16,12 +16,12 @@
     "grunt-contrib-jshint": "~0.7.2",
     "karma": "~0.10",
     "karma-jasmine": "~0.1",
-	"karma-phantomjs-launcher": "0.1.1",
+    "karma-phantomjs-launcher": "0.1.1",
     "grunt-conventional-changelog": "~1.0.0",
     "load-grunt-tasks": "~0.2.0",
     "grunt-contrib-uglify": "~0.2.7",
-    "grunt-karma": "~0.6.2"
-
+    "grunt-karma": "~0.6.2",
+    "karma-coverage": "~0.1.4"
   },
   "engines": {
     "node": ">=0.8.0",
