@@ -5,7 +5,7 @@ module.exports = function(config) {
 
 		// list of files / patterns to load in the browser
 		files: [
-			'etsy-jsonp.js',
+			'simple-jsonp.js',
 			'test/*.spec.js'
 		],
 
