@@ -3,12 +3,12 @@ module.exports = function(grunt) {
 		uglify: {
 			my_target: {
 				files: {
-					'simple-jsonp.min.js': ['simple-jsonp.js']
+					'etsy-jsonp.min.js': ['etsy-jsonp.js']
 				}
 			}
 		},
 		jshint: {
-			all: ['simple-jsonp.js'],
+			all: ['etsy-jsonp.js'],
 			options:  {
 				jshintrc: true
 			}

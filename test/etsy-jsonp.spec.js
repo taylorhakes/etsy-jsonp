@@ -26,9 +26,9 @@
         };
         if (type === 'eventListener') {
             script.addEventListener = function (event, callback) {
-                if (event === 'load') {
+                if(event === 'load') {
                     script.onload = callback;
-                } else if (event === 'error') {
+                } else if(event === 'error') {
                     script.onerror = callback;
                 }
             };
@@ -36,9 +36,9 @@
             };
         } else if (type === 'attachEvent') {
             script.attachEvent = function (event, callback) {
-                if (event === 'load') {
+                if(event === 'load') {
                     script.onload = callback;
-                } else if (event === 'error') {
+                } else if(event === 'error') {
                     script.onerror = callback;
                 }
             };
@@ -64,7 +64,7 @@
         it('No API Key throws error', function () {
             var error = false;
             try {
-                var test = new SimpleJsonp({});
+                var test = new EtsyJsonp({});
             } catch (e) {
                 error = true;
             }
@@ -73,25 +73,13 @@
         it('Specifying API Key does not throw error', function () {
             var error = false;
             try {
-                var test = new SimpleJsonp({
-                    apiKey: 'hello',
-                    apiUrl: 'http://hello'
-                });
-            } catch (e) {
-                error = true;
-            }
-            expect(error).toBe(false);
-        });
-        it('Not specifying API URL throws error', function () {
-            var error = false;
-            try {
-                var test = new SimpleJsonp({
+                var test = new EtsyJsonp({
                     apiKey: 'hello'
                 });
             } catch (e) {
                 error = true;
             }
-            expect(error).toBe(true);
+            expect(error).toBe(false);
         });
         it('Specifying API URL changes the API URL', function () {
             var changed = false;
@@ -102,10 +90,12 @@
                 }
             });
 
-            var test = new SimpleJsonp({
+
+            var test = new EtsyJsonp({
                 apiUrl: 'http://hello',
                 apiKey: 'test'
             });
+
 
             test.get({
                 path: '/path'
@@ -116,7 +106,7 @@
     describe('get function different params', function () {
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -213,7 +203,7 @@
                     changed = true;
                 }
             });
-            var test = new SimpleJsonp({
+            var test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -289,7 +279,7 @@
         var testName = 'customEtsy';
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -367,7 +357,7 @@
         var testName = 'customEtsy';
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -447,7 +437,7 @@
         var testName = 'customEtsy';
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -524,7 +514,7 @@
         var testName = 'customEtsy';
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -599,7 +589,7 @@
     describe('Check abort function', function () {
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -673,7 +663,7 @@
     describe('Test timeouts', function () {
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
@@ -741,7 +731,7 @@
     describe('Check unknown error', function () {
         var test = null;
         beforeEach(function () {
-            test = new SimpleJsonp({
+            test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
             });
