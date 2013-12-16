@@ -65,9 +65,11 @@
 
 			// Function gets called on error and on success
 			var onScript = function(e, errorType) {
+                if(!script) return;
 				clearTimeout(abortTimeout);
 				self._removeScriptEvents(script, onScript);
 				script.parentNode.removeChild(script);
+                script = null;
 
 				var error = null;
 				if (e.type === 'error') {
@@ -137,12 +139,12 @@
 			(document.head || document.documentElement).appendChild(script);
 
             abortTimeout = setTimeout(function() {
-                onScript({ type: 'error'}, 'timeout');
+                onScript({ type: 'error'}, 'Timeout');
             }, options.timeout || 5000);
 
 			return {
 				abort: function abort() {
-					onScript({ type: 'error'}, 'Request Aborted');
+					onScript({ type: 'error'}, 'Aborted');
 				}
 			};
 		},
@@ -171,7 +173,7 @@
 					if (typeof response === 'object' && response.error) {
 						prettyError = response.error;
 					} else {
-						prettyError = error == null ? 'Unknown error' : error;
+						prettyError = error == null ? 'Unknown Error' : error;
 					}
 					options.error({
 						error: prettyError
