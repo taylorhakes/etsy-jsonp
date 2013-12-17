@@ -5,6 +5,13 @@ JSONP Library for Etsy API
 
 [![Build Status](https://travis-ci.org/taylorhakes/etsy-jsonp.png)](https://travis-ci.org/taylorhakes/etsy-jsonp)
 
+100% test coverage!
+
+To run tests
+```
+grunt test
+```
+
 Documentation
 -------------
 This Jsonp library only supports GET requests to the Etsy API.
