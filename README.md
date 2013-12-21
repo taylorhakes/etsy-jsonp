@@ -24,6 +24,7 @@ var etsyApi = new EtsyJsonp({
 // Search for golf keyword
 var etsyXhr = etsyApi.get({
 	path: 'listings/active.js',
+	// Url and path params
 	params: {
 	    keywords: 'golf',
 	    limit: 10,
