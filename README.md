@@ -45,6 +45,27 @@ var etsyXhr = etsyApi.get({
 
 // To abort the previous call
 etsyXhr.abort();
+
+
+// Search for a specific item
+var etsyXhr = etsyApi.get({
+	path: 'listings/:listing_id.js',
+	// Url and path params
+	params: {
+	    listing_id: 1234
+	},
+	success: function(info) {
+	    console.log('success',info);
+	    console.log('response',info.response);
+	},
+	error: function(info) {
+	    console.log('error', info);
+	    console.log('error text', info.error);
+	},
+	done: function() {
+		console.log('done');
+	}
+});
 ```
 
 The MIT License (MIT)
