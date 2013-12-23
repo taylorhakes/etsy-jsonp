@@ -663,6 +663,7 @@
     describe('Test timeouts', function () {
         var test = null;
         beforeEach(function () {
+			jasmine.Clock.useMock();
             test = new EtsyJsonp({
                 apiUrl: 'http://hello/',
                 apiKey: 'test'
@@ -688,6 +689,7 @@
                         }
                     }
                 });
+				jasmine.Clock.tick(5001);
             });
             waitsFor(function () {
                 return changed;
@@ -717,6 +719,7 @@
                         }
                     }
                 });
+				jasmine.Clock.tick(201);
             });
             waitsFor(function () {
                 return changed;
